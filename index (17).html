@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe v3 - Vendor Intelligence Platform</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .main-container { max-width: 1600px; margin: auto; }
+        .card { background-color: white; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05); transition: all 0.3s ease-in-out; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s ease; cursor: pointer; }
+        .btn-primary { background-color: #4f46e5; color: white; }
+        .btn-primary:hover { background-color: #4338ca; }
+        .btn-secondary { background-color: #e2e8f0; color: #1e293b; border: 1px solid #e2e8f0; }
+        .btn-secondary:hover { background-color: #cbd5e1; }
+        .btn-disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; }
+        .modal-content { width: 90%; max-width: 600px; }
+        .pill { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        @keyframes progress-indeterminate { 0% { transform: translateX(-100%) scaleX(0.5); } 50% { transform: translateX(0) scaleX(0.5); } 100% { transform: translateX(100%) scaleX(0.5); } }
+        .progress-bar-indeterminate::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; background-color: #4f46e5; width: 100%; animation: progress-indeterminate 1.5s infinite ease-in-out; }
+        
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #334155; color: #fff; text-align: left; border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; font-size: 12px; line-height: 1.5; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #334155 transparent transparent transparent; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        
+        .treemap { display: flex; flex-wrap: wrap; width: 100%; height: 100%; padding: 2px; }
+        .treemap-cell { box-sizing: border-box; padding: 8px; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.2s ease; cursor: pointer; }
+        .treemap-cell:hover { transform: scale(1.05); z-index: 10; }
+        .treemap-cell .category { font-weight: bold; font-size: 14px; }
+        .treemap-cell .count { font-size: 12px; opacity: 0.8; }
+        
+        .suggestion-chip { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; cursor: pointer; }
+        .suggestion-chip:hover { background-color: #e2e8f0; border-color: #cbd5e1; }
+        
+        .modal-tab-button { border-bottom: 2px solid transparent; color: #64748b; }
+        .modal-tab-button.active { border-bottom-color: #4f46e5; color: #4f46e5; font-weight: 600; }
+        .modal-tab-content { display: none; }
+        .modal-tab-content.active { display: block; }
+
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="main-container space-y-8">
+        <header class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Vendor Intelligence Platform</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="view-reports-log-btn" class="btn btn-secondary">Report Logs</button>
+                <span class="text-slate-500">Vikram (CFO)</span>
+                <img src="https://placehold.co/40x40/E2E8F0/475569?text=V" class="rounded-full" alt="User Avatar">
+            </div>
+        </header>
+
+        <main id="app">
+            <div id="page-vendor-master" class="page active space-y-6">
+                 <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-slate-700">Vendor Master</h2>
+                    <div class="flex items-center space-x-2">
+                         <div class="relative"><input type="text" placeholder="Search vendors..." class="pl-10 pr-4 py-2 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div></div>
+                        <button id="select-from-file-btn" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Select from File</button>
+                        <button id="run-check-btn" class="btn btn-primary btn-disabled"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>Run Check (<span id="selected-count">0</span>)</button>
+                    </div>
+                </div>
+                <div class="card overflow-x-auto">
+                    <table class="w-full text-left"><thead class="bg-slate-50 border-b border-slate-200"><tr><th class="p-4 w-12"><input type="checkbox" id="select-all-vendors"></th><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Vendor Name</th><th class="p-4 font-semibold text-slate-600">Vendor Code</th><th class="p-4 font-semibold text-slate-600">Category</th><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Last Report Date</th></tr></thead><tbody id="vendor-table-body"></tbody></table>
+                </div>
+            </div>
+
+            <div id="page-report-logs" class="page space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-slate-700">Vendor Report Logs</h2>
+                    <button id="back-to-master-btn" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back to Vendor Master</button>
+                </div>
+                <div class="card overflow-x-auto">
+                    <table class="w-full text-left"><thead class="bg-slate-50 border-b border-slate-200"><tr><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Report Name</th><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Report Status</th><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Vendor Count</th><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Report Date</th><th class="p-4 font-semibold text-slate-600 whitespace-nowrap">Created By</th><th class="p-4 font-semibold text-slate-600">Actions</th></tr></thead><tbody id="report-logs-table-body"></tbody></table>
+                </div>
+            </div>
+
+            <div id="page-report-dashboard" class="page space-y-6">
+                 <div class="flex items-center space-x-4">
+                     <button id="back-to-logs-btn" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back to Reports</button>
+                    <h2 class="text-xl font-semibold text-slate-700" id="report-dashboard-title"></h2>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="card p-6 flex items-start space-x-4 bg-indigo-50 border-indigo-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600 flex-shrink-0 mt-1"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-800">AI-Powered Summary</h3>
+                            <p class="text-slate-600 mt-1">This report covers 50 vendors. We found <strong class="text-red-600">4 with critical payment risks</strong> due to inactive GSTINs. We've also identified a high concentration of <strong class="text-amber-600">GST filing delays in your 'Logistics' vendors</strong>, suggesting potential cash flow issues in that category.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-6"><h3 class="font-semibold text-slate-700 mb-4">Overall Vendor Health</h3><div class="relative h-72"><canvas id="risk-distribution-chart"></canvas></div></div>
+                        <div class="card p-6"><h3 class="font-semibold text-slate-700 mb-4">Top 5 Active Risk Flags</h3><div class="relative h-72"><canvas id="top-risks-chart"></canvas></div></div>
+                        <div class="card p-6"><h3 class="font-semibold text-slate-700 mb-4">Compliance Health Trend</h3><div class="relative h-72"><canvas id="health-trend-chart"></canvas></div></div>
+                        <div class="card p-6"><h3 class="font-semibold text-slate-700 mb-4">Risk Hotspots by Category</h3><div class="relative h-72"><div id="risk-hotspots-chart" class="treemap"></div></div></div>
+                    </div>
+
+                    <div id="ai-insight-section" class="card p-6 space-y-4">
+                        <div class="flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg><h3 class="text-xl font-semibold text-slate-800">Ask AI for Insights</h3></div>
+                        <div class="flex space-x-4"><input type="text" id="ai-prompt-input" placeholder="e.g., Show me a pie graph of MSME status by category" class="flex-grow border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"><button id="generate-insight-btn" class="btn btn-primary">Generate Insight</button></div>
+                        <div class="flex flex-wrap gap-2"><button class="suggestion-chip btn btn-sm" data-prompt="Vendors with filing delays by category">Vendors with filing delays by category</button><button class="suggestion-chip btn btn-sm" data-prompt="Pie chart of vendors with failed bank verification">Pie chart of vendors with failed bank verification</button></div>
+                        <div id="ai-result-container" class="hidden pt-4 mt-4 border-t"><div id="ai-loading-state" class="text-center p-4"><p class="text-slate-600">🤖 Generating insight...</p></div><div id="ai-content-state" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 items-center"><div><h4 class="font-semibold text-slate-700 mb-2" id="ai-chart-title"></h4><div class="relative h-64"><canvas id="ai-generated-chart"></canvas></div></div><div><h4 class="font-semibold text-slate-700 mb-2">AI Summary</h4><p class="text-sm text-slate-600 bg-slate-50 p-4 rounded-lg" id="ai-summary-text"></p></div></div></div>
+                    </div>
+                    
+                    <div class="card overflow-x-auto">
+                         <table class="w-full text-left text-sm"><thead class="bg-slate-50 border-b border-slate-200"><tr><th class="p-3 font-semibold text-slate-600 whitespace-nowrap">Vendor</th><th class="p-3 font-semibold text-slate-600">Category</th><th class="p-3 font-semibold text-slate-600 whitespace-nowrap">MCA Status</th><th class="p-3 font-semibold text-slate-600 whitespace-nowrap">MSME Status</th><th class="p-3 font-semibold text-slate-600 whitespace-nowrap">E-Invoice</th><th class="p-3 font-semibold text-slate-600 whitespace-nowrap">Bank Status</th><th class="p-3 font-semibold text-slate-600">Actions</th></tr></thead><tbody id="report-vendor-table-body"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-vendor-drilldown" class="page space-y-6">
+                <button id="back-to-report-btn" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back to Report Dashboard</button>
+                <div class="card p-6">
+                     <div class="flex items-center justify-between">
+                         <div><h2 class="text-2xl font-bold text-slate-800">Global Tech Solutions Inc.</h2><p class="text-slate-500">Vendor Code: V-1003</p></div>
+                         <div class="text-right"><span class="text-5xl font-bold text-red-600">35</span><p class="font-semibold text-red-600">CRITICAL RISK</p></div>
+                    </div>
+                </div>
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 card p-6 space-y-4 self-start">
+                         <h3 class="text-lg font-semibold text-slate-800 border-b pb-2">Vendor Profile Snapshot</h3>
+                         <div class="space-y-3 text-sm">
+                            <div><strong class="font-medium text-slate-600 block">Legal Name</strong><span class="text-slate-500">Global Tech Solutions Incorporated</span></div>
+                            <div><strong class="font-medium text-slate-600 block">Business Age</strong><span class="text-slate-500">12 Years, 5 Months</span></div>
+                            <div><strong class="font-medium text-slate-600 block">Turnover Range</strong><span class="text-slate-500">₹50 Cr - ₹100 Cr</span></div>
+                            <div><strong class="font-medium text-slate-600 block">MSME Status</strong><span class="text-slate-500">Not Applicable</span></div>
+                            <div><strong class="font-medium text-slate-600 block">PAN-Linked GSTINs</strong><span class="text-slate-500">3 (1 Inactive)</span></div>
+                             <div><strong class="font-medium text-slate-600 block">Latest Employee Count</strong><span class="text-slate-500 flex items-center">452 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500 ml-2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg><span class="text-red-500">15% Drop</span></span></div>
+                         </div>
+                    </div>
+                    <div class="lg:col-span-2 card p-6 space-y-4">
+                        <h3 class="text-lg font-semibold text-slate-800 border-b pb-2">Active Risk Flags</h3>
+                        <div class="border border-red-200 bg-red-50 p-4 rounded-lg"><div class="flex justify-between items-start"><div><span class="pill bg-red-200 text-red-800">CRITICAL</span><h4 class="font-semibold text-slate-800 mt-2">Vendor's GSTIN is 'Cancelled'</h4></div><span class="text-red-600 font-bold text-lg">-40 pts</span></div><p class="text-slate-600 text-sm mt-1">This vendor cannot legally issue valid invoices. Payments may be subject to reversal and input tax credit will be denied.</p><div class="mt-3 text-sm"><strong class="font-medium text-slate-700">Recommended Action:</strong><span class="text-slate-600"> Immediately place all payments on hold and contact the vendor for clarification. Do not accept any new invoices.</span></div></div>
+                        <div class="border border-red-200 bg-red-50 p-4 rounded-lg"><div class="flex justify-between items-start"><div><span class="pill bg-red-200 text-red-800">CRITICAL</span><h4 class="font-semibold text-slate-800 mt-2">Bank Account Verification Failed</h4></div><span class="text-red-600 font-bold text-lg">-40 pts</span></div><p class="text-slate-600 text-sm mt-1">The provided bank account details could not be validated or do not match the vendor's legal entity. High risk of payment fraud.</p><div class="mt-3 text-sm"><strong class="font-medium text-slate-700">Recommended Action:</strong><span class="text-slate-600"> Do not process any payments. Re-verify bank details with a formal 'Account Change' request process.</span></div></div>
+                        <div class="border border-amber-200 bg-amber-50 p-4 rounded-lg"><div class="flex justify-between items-start"><div><span class="pill bg-amber-200 text-amber-800">MEDIUM</span><h4 class="font-semibold text-slate-800 mt-2">Consistent GST Filing Delays</h4></div><span class="text-amber-600 font-bold text-lg">-15 pts</span></div><p class="text-slate-600 text-sm mt-1">Vendor has delayed GSTR-3B filings for 4 of the last 6 months, indicating potential cash flow problems or poor financial discipline.</p><div class="mt-3 text-sm"><strong class="font-medium text-slate-700">Recommended Action:</strong><span class="text-slate-600"> Monitor this vendor closely. Consider adjusting payment terms or reducing credit exposure.</span></div></div>
+                    </div>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="api-selector-modal" class="modal-overlay hidden"><div class="modal-content card p-6 space-y-6">
+        <div class="flex justify-between items-center"><h2 class="text-xl font-semibold text-slate-800">Select Compliance Checks</h2><button id="close-api-modal-btn" class="text-slate-500 hover:text-slate-800 text-2xl font-bold">&times;</button></div>
+        <div>
+            <h3 class="font-semibold text-slate-700">Packages</h3>
+            <div class="grid grid-cols-2 gap-4 mt-2">
+                <button id="pkg-essential" class="text-left p-4 border rounded-lg hover:bg-slate-50 focus:ring-2 focus:ring-indigo-500"><h4 class="font-bold">Essential KYC</h4><p class="text-sm text-slate-500">PAN, GSTIN, Bank Account</p></button>
+                <button id="pkg-full" class="text-left p-4 border rounded-lg hover:bg-slate-50 focus:ring-2 focus:ring-indigo-500"><h4 class="font-bold">Full Due Diligence</h4><p class="text-sm text-slate-500">All available checks</p></button>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <h3 class="font-semibold text-slate-700">Individual Checks</h3>
+            <div id="api-checks-list" class="space-y-2"></div>
+        </div>
+        <div class="flex justify-end space-x-4"><button id="cancel-api-modal-btn" class="btn btn-secondary">Cancel</button><button id="create-report-btn" class="btn btn-primary">Create Report</button></div>
+    </div></div>
+
+    <div id="file-selector-modal" class="modal-overlay hidden"><div class="modal-content card p-6">
+        <div class="flex justify-between items-center"><h2 class="text-xl font-semibold text-slate-800">Run a Bulk Check</h2><button id="close-file-modal-btn" class="text-slate-500 hover:text-slate-800 text-2xl font-bold">&times;</button></div>
+        <div class="border-b border-slate-200 mt-4"><nav class="-mb-px flex space-x-6" aria-label="Tabs"><button class="modal-tab-button active" data-tab="from-master">From Vendor Master</button><button class="modal-tab-button" data-tab="new-vendors">Check New Vendors</button></nav></div>
+        <div class="mt-4">
+            <div id="from-master" class="modal-tab-content active space-y-4">
+                <p class="text-sm text-slate-600">Upload a file with **Vendor Codes** to select from your master list.</p>
+                <div id="from-master-initial-state">
+                    <div class="mt-4 p-6 border-2 border-dashed border-slate-300 rounded-lg text-center"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-slate-400"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg><button id="simulate-upload-master-btn" class="mt-4 btn btn-primary">Browse Files</button><p class="text-xs text-slate-500 mt-2">.csv or .xlsx, single column</p></div>
+                    <div class="text-center mt-2"><a href="#" class="text-sm text-indigo-600 hover:underline">Download Template</a></div>
+                </div>
+                <div id="from-master-feedback-state" class="hidden space-y-4">
+                    <h3 class="font-semibold text-slate-800">Upload Summary</h3>
+                    <div class="p-3 bg-green-50 border border-green-200 rounded-lg"><p class="font-medium text-green-800">✅ 50 vendors were successfully found and selected.</p></div>
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg"><p class="font-medium text-red-800">❌ 3 vendors from your file were not found:</p><p class="text-sm text-red-700 font-mono mt-1">V-9991, V-9992, V-9993</p><a href="#" class="text-sm text-red-600 hover:underline mt-1 inline-block">Download list of not-found vendors</a></div>
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg"><p class="font-medium text-amber-800">⚠️ 2 duplicate vendor codes in your file were ignored.</p></div>
+                </div>
+                <div class="flex justify-end pt-4"><button id="proceed-with-selection-btn" class="btn btn-primary hidden">Proceed with 50 Vendors</button></div>
+            </div>
+            <div id="new-vendors" class="modal-tab-content space-y-4">
+                <p class="text-sm text-slate-600">Upload a file with **PANs** and other details to run a one-time check on new vendors.</p>
+                <div class="mt-4 p-6 border-2 border-dashed border-slate-300 rounded-lg text-center"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-slate-400"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg><button id="simulate-upload-new-btn" class="mt-4 btn btn-primary">Browse "New Vendors.csv"</button><p class="text-xs text-slate-500 mt-2">.csv or .xlsx, multi-column</p></div>
+                <div class="text-center mt-2"><a href="#" class="text-sm text-indigo-600 hover:underline">Download Template</a></div>
+            </div>
+        </div>
+    </div></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- MOCK DATA ---
+        const mockVendors = [];
+        for(let i=1; i<=100; i++){
+            const categories = ['IT Services', 'Logistics', 'Marketing', 'Raw Materials', 'Office Supplies'];
+            mockVendors.push({id: i, name: `Vendor #${i} Ltd.`, code: `V-1${String(i-1).padStart(3, '0')}`, category: categories[i % 5], lastReport: `2025-0${(i%5)+1}-${String((i%28)+1).padStart(2, '0')}`});
+        }
+        const mockApiChecks = [
+            { id: 'pan', name: 'PAN Verification', group: 'Foundational Identity', subscribed: true, useCase: 'Verifies the validity of the PAN and the name associated with it.' },
+            { id: 'gstin_adv', name: 'GSTIN Verification (Advanced)', group: 'Foundational Identity', subscribed: true, useCase: 'Provides business name, address, registration date, and compliance rating.' },
+            { id: 'bank', name: 'Bank Account Verification', group: 'Foundational Identity', subscribed: true, useCase: 'Confirms the vendor\'s bank account ownership to prevent payment fraud.' },
+            { id: 'gst_tracker', name: 'GST Filing Tracker', group: 'Financial Health', subscribed: true, useCase: 'Provides a detailed history of GSTR-1 and GSTR-3B filings.' },
+            { id: 'sec_206ab', name: 'Section 206AB Check', group: 'Financial Health', subscribed: true, useCase: 'Determines if a higher TDS rate is applicable due to non-filing of ITRs.' },
+            { id: 'mca', name: 'MCA Company KYC', group: 'Financial Health', subscribed: false, useCase: 'Pulls master data from the Ministry of Corporate Affairs. (Requires Premium Plan)' },
+            { id: 'msme', name: 'MSME Verification (Udyam)', group: 'Operational Checks', subscribed: true, useCase: 'Verifies if a vendor is a registered Micro, Small, or Medium Enterprise.' },
+            { id: 'epfo', name: 'EPFO Employee Count', group: 'Operational Checks', subscribed: false, useCase: 'Checks latest employee count from EPFO portal. (Requires Premium Plan)' },
+        ];
+        const mockReportData = mockVendors.slice(0, 50).map((v, i) => {
+            let score, band, flags, mcaStatus, msmeStatus, msmeCategory, eInvoice, bankStatus;
+            const vendorDetails = mockVendors.find(mv => mv.id === v.id);
+            if (i === 2) { score = 35; band = 'Critical Risk'; flags = 2; mcaStatus = 'Active'; msmeStatus = 'N/A'; msmeCategory = 'N/A'; eInvoice = 'Yes'; bankStatus = 'Failed'; } 
+            else if (i < 5) { score = 25; band = 'Critical Risk'; flags = 1; mcaStatus = 'Struck Off'; msmeStatus = 'N/A'; msmeCategory = 'N/A'; eInvoice = 'Yes'; bankStatus = 'Verified'; } 
+            else if (i < 15) { score = 68; band = 'Moderate Risk'; flags = 0; mcaStatus = 'Active'; msmeStatus = 'Verified'; msmeCategory = 'Micro'; eInvoice = 'No'; bankStatus = 'Verified'; } 
+            else if (i < 35) { score = 82; band = 'Good'; flags = 0; mcaStatus = 'Active'; msmeStatus = 'Verified'; msmeCategory = 'Small'; eInvoice = 'Yes'; bankStatus = 'Verified'; } 
+            else { score = 95; band = 'Excellent'; flags = 0; mcaStatus = 'Active'; msmeStatus = 'N/A'; msmeCategory = 'N/A'; eInvoice = 'Yes'; bankStatus = 'Verified'; }
+            return { ...v, score, band, flags, age: `${i+2} yrs`, turnover: `₹${i+1}-${i+5} Cr`, category: vendorDetails.category, mcaStatus, msmeStatus, msmeCategory, eInvoiceApplicable: eInvoice, bankStatus };
+        });
+        
+        // --- DOM ELEMENTS ---
+        const pages = document.querySelectorAll('.page');
+        const vendorTableBody = document.getElementById('vendor-table-body');
+        const runCheckBtn = document.getElementById('run-check-btn');
+        const selectedCountSpan = document.getElementById('selected-count');
+        const selectAllCheckbox = document.getElementById('select-all-vendors');
+        const apiSelectorModal = document.getElementById('api-selector-modal');
+        const closeApiModalBtn = document.getElementById('close-api-modal-btn');
+        const cancelApiModalBtn = document.getElementById('cancel-api-modal-btn');
+        const createReportBtn = document.getElementById('create-report-btn');
+        const apiChecksListContainer = document.getElementById('api-checks-list');
+        const backToMasterBtn = document.getElementById('back-to-master-btn');
+        const backToReportBtn = document.getElementById('back-to-report-btn');
+        const backToLogsBtn = document.getElementById('back-to-logs-btn');
+        const reportVendorTableBody = document.getElementById('report-vendor-table-body');
+        const reportLogsTableBody = document.getElementById('report-logs-table-body');
+        const reportDashboardTitle = document.getElementById('report-dashboard-title');
+        const selectFromFileBtn = document.getElementById('select-from-file-btn');
+        const fileSelectorModal = document.getElementById('file-selector-modal');
+        const closeFileModalBtn = document.getElementById('close-file-modal-btn');
+        const fromMasterInitial = document.getElementById('from-master-initial-state');
+        const fromMasterFeedback = document.getElementById('from-master-feedback-state');
+        const proceedWithSelectionBtn = document.getElementById('proceed-with-selection-btn');
+        const simulateUploadMasterBtn = document.getElementById('simulate-upload-master-btn');
+        const simulateUploadNewBtn = document.getElementById('simulate-upload-new-btn');
+        const aiPromptInput = document.getElementById('ai-prompt-input');
+        const generateInsightBtn = document.getElementById('generate-insight-btn');
+        const suggestionChips = document.querySelectorAll('.suggestion-chip');
+        const aiResultContainer = document.getElementById('ai-result-container');
+        const aiLoadingState = document.getElementById('ai-loading-state');
+        const aiContentState = document.getElementById('ai-content-state');
+        const aiChartTitle = document.getElementById('ai-chart-title');
+        const aiSummaryText = document.getElementById('ai-summary-text');
+        
+        // --- STATE ---
+        let selectedVendors = new Set();
+        let currentCharts = {};
+        let aiGeneratedChart = null;
+        let isOneTimeCheckFlow = false;
+        let mockReports = [
+            { id: 1, name: "Q1 Vendor Audit", status: "Completed", vendorCount: 25, date: "2025-03-15", user: "Demo User" },
+            { id: 2, name: "New Logistics Onboarding", status: "Completed", vendorCount: 5, date: "2025-04-22", user: "Demo User" },
+        ];
+
+        // --- FUNCTIONS ---
+        const navigate = (pageId) => {
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId)?.classList.add('active');
+            window.scrollTo(0, 0);
+        };
+
+        const updateSelectionCount = () => {
+            selectedCountSpan.textContent = selectedVendors.size;
+            runCheckBtn.classList.toggle('btn-disabled', selectedVendors.size === 0);
+            runCheckBtn.classList.toggle('btn-primary', selectedVendors.size > 0);
+        };
+        
+        const renderVendorTable = () => { vendorTableBody.innerHTML = mockVendors.map(v => `<tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-4"><input type="checkbox" class="vendor-checkbox" data-id="${v.id}" ${selectedVendors.has(v.id) ? 'checked' : ''}></td><td class="p-4 font-medium text-slate-800 whitespace-nowrap">${v.name}</td><td class="p-4 text-slate-500">${v.code}</td><td class="p-4 text-slate-500">${v.category}</td><td class="p-4 text-slate-500 whitespace-nowrap">${v.lastReport}</td></tr>`).join(''); updateSelectionCount(); };
+        
+        const applyFilterAndRender = (filterFn) => {
+            const dataToRender = filterFn ? mockReportData.filter(filterFn) : mockReportData;
+            renderReportVendorTable(dataToRender);
+        };
+
+        const renderReportVendorTable = (data) => {
+            const getStatusPill = (status) => {
+                switch(status) {
+                    case 'Active': return `<span class="pill bg-green-100 text-green-800">${status}</span>`;
+                    case 'Struck Off': return `<span class="pill bg-red-100 text-red-800">${status}</span>`;
+                    case 'Verified': return `<span class="pill bg-green-100 text-green-800">${status}</span>`;
+                    case 'Failed': return `<span class="pill bg-red-100 text-red-800">${status}</span>`;
+                    case 'N/A': return `<span class="text-slate-400">${status}</span>`;
+                    default: return `<span>${status}</span>`;
+                }
+            };
+            reportVendorTableBody.innerHTML = data.map(v => `
+                <tr class="border-b border-slate-200 hover:bg-slate-50">
+                    <td class="p-3 font-medium text-slate-800 whitespace-nowrap">
+                        <div class="cursor-pointer hover:text-indigo-600" onclick="appState.viewVendorDrilldown('${v.id}')">${v.name}</div>
+                        <div class="text-xs text-slate-500">${v.code}</div>
+                    </td>
+                    <td class="p-3 text-slate-600">${v.category}</td>
+                    <td class="p-3">${getStatusPill(v.mcaStatus)}</td>
+                    <td class="p-3">
+                        <div>${v.msmeStatus !== 'N/A' ? getStatusPill(v.msmeStatus) : '<span class="text-slate-400">N/A</span>'}</div>
+                        ${v.msmeCategory !== 'N/A' ? `<div class="text-xs text-slate-500">${v.msmeCategory}</div>` : ''}
+                    </td>
+                    <td class="p-3 text-slate-600">${v.eInvoiceApplicable}</td>
+                    <td class="p-3">${getStatusPill(v.bankStatus)}</td>
+                    <td class="p-3">
+                        <button class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-md" title="View in Master" onclick="appState.viewInMaster('${v.id}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </td>
+                </tr>`).join('');
+        };
+
+        const renderApiChecks = () => {
+            const grouped = mockApiChecks.reduce((acc, check) => { (acc[check.group] = acc[check.group] || []).push(check); return acc; }, {});
+            apiChecksListContainer.innerHTML = Object.entries(grouped).map(([group, checks]) => `<div><h4 class="font-medium text-slate-700 mb-2">${group}</h4><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${checks.map(c => `<label for="api-${c.id}" class="flex items-center p-3 rounded-lg border ${c.subscribed ? 'bg-white hover:border-indigo-400 cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}"><input id="api-${c.id}" type="checkbox" class="api-checkbox h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" data-id="${c.id}" ${!c.subscribed ? 'disabled' : ''}><span class="ml-3 flex-grow font-medium">${c.name}</span>${c.subscribed ? `<div class="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span class="tooltiptext">${c.useCase}</span></div>` : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`}</label>`).join('')}</div></div>`).join('');
+        };
+        const destroyCharts = () => { Object.values(currentCharts).forEach(chart => chart.destroy()); currentCharts = {}; };
+        const renderCharts = (data) => {
+            destroyCharts();
+            const riskDistCtx = document.getElementById('risk-distribution-chart').getContext('2d');
+            const topRisksCtx = document.getElementById('top-risks-chart').getContext('2d');
+            const healthTrendCtx = document.getElementById('health-trend-chart').getContext('2d');
+            const riskHotspotsContainer = document.getElementById('risk-hotspots-chart');
+
+            const bands = data.reduce((acc, v) => { acc[v.band] = (acc[v.band] || 0) + 1; return acc; }, {});
+            const bandData = { labels: ['Critical Risk', 'Moderate Risk', 'Good', 'Excellent'], datasets: [{ data: [bands['Critical Risk']||0, bands['Moderate Risk']||0, bands['Good']||0, bands['Excellent']||0], backgroundColor: ['#ef4444', '#f59e0b', '#38bdf8', '#10b981'] }] };
+            currentCharts.riskDist = new Chart(riskDistCtx, { type: 'doughnut', data: bandData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, onClick: (e, elements) => { if (elements.length > 0) { const clickedLabel = bandData.labels[elements[0].index]; applyFilterAndRender(v => v.band === clickedLabel); } } } });
+            
+            const topRisksData = { labels: ['GSTIN Inactive', 'Bank Name Mismatch', 'Filing Delays', 'PAN Name Mismatch', 'MCA Director Risk'], datasets: [{ label: '# of Vendors', data: [4, 3, 10, 2, 1], backgroundColor: '#4f46e5', borderRadius: 4, }] };
+            currentCharts.topRisks = new Chart(topRisksCtx, { type: 'bar', data: topRisksData, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }, onClick: (e, elements) => { if (elements.length > 0) { const clickedLabel = topRisksData.labels[elements[0].index]; if (clickedLabel === 'Filing Delays') applyFilterAndRender(v => v.category === 'Logistics'); else if (clickedLabel === 'GSTIN Inactive') applyFilterAndRender(v => v.mcaStatus === 'Struck Off'); else applyFilterAndRender(); } } } });
+            
+            const healthTrendData = { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Avg. Health Score', data: [75, 78, 82, 79, 85, 88], fill: true, borderColor: 'rgb(75, 192, 192)', tension: 0.1, backgroundColor: 'rgba(75, 192, 192, 0.2)' }] };
+            currentCharts.healthTrend = new Chart(healthTrendCtx, { type: 'line', data: healthTrendData, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, suggestedMin: 60 } }, onClick: () => applyFilterAndRender() } });
+            
+            const categoryData = data.reduce((acc, v) => {
+                if(!acc[v.category]) acc[v.category] = { count: 0, scoreSum: 0 };
+                acc[v.category].count++;
+                acc[v.category].scoreSum += v.score;
+                return acc;
+            }, {});
+            const categoryArray = Object.entries(categoryData).map(([name, {count, scoreSum}]) => ({ name, count, avgScore: scoreSum/count }));
+            const totalVendors = data.length;
+            const getHotspotColor = (score) => { if (score < 41) return 'bg-red-600'; if (score < 75) return 'bg-amber-500'; if (score < 90) return 'bg-sky-500'; return 'bg-emerald-500'; };
+            riskHotspotsContainer.innerHTML = categoryArray.map(cat => `<div class="treemap-cell ${getHotspotColor(cat.avgScore)}" style="width:${(cat.count / totalVendors) * 100}%;" data-category="${cat.name}">
+                <div class="category">${cat.name}</div><div class="count">${cat.count} vendors</div></div>`).join('');
+        };
+        const startReportGeneration = () => {
+            closeApiModal();
+            const reportName = isOneTimeCheckFlow 
+                ? `One-Time Check Report`
+                : `Bulk Report for ${selectedVendors.size} vendors`;
+            const vendorCount = isOneTimeCheckFlow ? 5 : selectedVendors.size; // Simulate 5 new vendors from file
+
+            const newReport = {
+                id: mockReports.length + 1,
+                name: reportName,
+                status: "In Progress",
+                vendorCount: vendorCount,
+                date: new Date().toISOString().split('T')[0],
+                user: "Demo User"
+            };
+            mockReports.unshift(newReport);
+            renderReportLogsTable();
+            navigate('page-report-logs');
+
+            setTimeout(() => {
+                const completedReport = mockReports.find(r => r.id === newReport.id);
+                if (completedReport) {
+                    completedReport.status = 'Completed';
+                    renderReportLogsTable();
+                }
+            }, 4000);
+        };
+        const renderReportLogsTable = () => {
+            reportLogsTableBody.innerHTML = mockReports.map(r => {
+                const isCompleted = r.status === 'Completed';
+                return `<tr class="border-b border-slate-200"><td class="p-4 font-medium text-slate-800 whitespace-nowrap">${r.name}</td><td class="p-4"><span class="pill ${isCompleted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">${r.status}</span></td><td class="p-4 text-slate-500">${r.vendorCount}</td><td class="p-4 text-slate-500 whitespace-nowrap">${r.date}</td><td class="p-4 text-slate-500 whitespace-nowrap">${r.user}</td><td class="p-4">${isCompleted ? `<button class="btn btn-primary btn-sm view-report-btn" data-report-id="${r.id}">View Report</button>` : `<button class="btn btn-disabled btn-sm">View Report</button>`}</td></tr>`;
+            }).join('');
+        };
+        
+        const openApiModal = () => {
+            const vendorCount = isOneTimeCheckFlow ? 5 : selectedVendors.size; // Simulate 5 for new upload
+            document.getElementById('create-report-btn').textContent = `Create Report for ${vendorCount} Vendor(s)`;
+            apiSelectorModal.classList.remove('hidden');
+        }
+        const closeApiModal = () => apiSelectorModal.classList.add('hidden');
+        const openFileModal = () => fileSelectorModal.classList.remove('hidden');
+        const closeFileModal = () => { fileSelectorModal.classList.add('hidden'); setTimeout(() => { fromMasterInitial.classList.remove('hidden'); fromMasterFeedback.classList.add('hidden'); proceedWithSelectionBtn.classList.add('hidden');}, 300); };
+
+        // --- EVENT LISTENERS ---
+        vendorTableBody.addEventListener('change', e => { if (e.target.classList.contains('vendor-checkbox')) { const id = parseInt(e.target.dataset.id); e.target.checked ? selectedVendors.add(id) : selectedVendors.delete(id); updateSelectionCount(); selectAllCheckbox.checked = selectedVendors.size === mockVendors.length; } });
+        selectAllCheckbox.addEventListener('change', e => { document.querySelectorAll('.vendor-checkbox').forEach(cb => { const id = parseInt(cb.dataset.id); cb.checked = e.target.checked; e.target.checked ? selectedVendors.add(id) : selectedVendors.delete(id); }); updateSelectionCount(); });
+        
+        runCheckBtn.addEventListener('click', () => { if (selectedVendors.size > 0) { isOneTimeCheckFlow = false; openApiModal(); } });
+        
+        closeApiModalBtn.addEventListener('click', closeApiModal);
+        cancelApiModalBtn.addEventListener('click', closeApiModal);
+        createReportBtn.addEventListener('click', startReportGeneration);
+        
+        document.getElementById('view-reports-log-btn').addEventListener('click', () => navigate('page-report-logs'));
+        backToMasterBtn.addEventListener('click', () => navigate('page-vendor-master'));
+        backToLogsBtn.addEventListener('click', () => navigate('page-report-logs'));
+        backToReportBtn.addEventListener('click', () => navigate('page-report-dashboard'));
+        
+        reportLogsTableBody.addEventListener('click', e => {
+            if (e.target.classList.contains('view-report-btn')) {
+                const reportId = e.target.dataset.reportId;
+                const report = mockReports.find(r => r.id == reportId);
+                reportDashboardTitle.textContent = report.name;
+                applyFilterAndRender();
+                renderCharts(mockReportData);
+                navigate('page-report-dashboard');
+            }
+        });
+
+        document.getElementById('risk-hotspots-chart').addEventListener('click', e => {
+            const cell = e.target.closest('.treemap-cell');
+            if(cell) {
+                const category = cell.dataset.category;
+                applyFilterAndRender(v => v.category === category);
+            }
+        });
+
+        selectFromFileBtn.addEventListener('click', openFileModal);
+        closeFileModalBtn.addEventListener('click', closeFileModal);
+        
+        const fileModalTabs = document.querySelectorAll('.modal-tab-button');
+        const fileModalContents = document.querySelectorAll('.modal-tab-content');
+        fileModalTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                fileModalTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                fileModalContents.forEach(c => c.classList.remove('active'));
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        simulateUploadMasterBtn.addEventListener('click', () => { fromMasterInitial.classList.add('hidden'); fromMasterFeedback.classList.remove('hidden'); proceedWithSelectionBtn.classList.remove('hidden'); });
+        proceedWithSelectionBtn.addEventListener('click', () => { selectedVendors.clear(); mockReportData.forEach(v => selectedVendors.add(v.id)); renderVendorTable(); closeFileModal(); });
+        simulateUploadNewBtn.addEventListener('click', () => {
+            isOneTimeCheckFlow = true;
+            closeFileModal();
+            openApiModal();
+        });
+        
+        document.getElementById('pkg-essential').addEventListener('click', () => { const essentialApis = ['pan', 'gstin_adv', 'bank']; document.querySelectorAll('.api-checkbox').forEach(cb => { const api = mockApiChecks.find(a => a.id === cb.dataset.id); if (api.subscribed) { cb.checked = essentialApis.includes(api.id); } }); });
+        document.getElementById('pkg-full').addEventListener('click', () => { document.querySelectorAll('.api-checkbox').forEach(cb => { const api = mockApiChecks.find(a => a.id === cb.dataset.id); if (api.subscribed) { cb.checked = true; } }); });
+        
+        const handleAIInsightGeneration = (prompt) => {
+            aiResultContainer.classList.remove('hidden');
+            aiLoadingState.classList.remove('hidden');
+            aiContentState.classList.add('hidden');
+            if(aiGeneratedChart) aiGeneratedChart.destroy();
+
+            setTimeout(() => {
+                aiLoadingState.classList.add('hidden');
+                aiContentState.classList.remove('hidden');
+                const ctx = document.getElementById('ai-generated-chart').getContext('2d');
+                if(prompt.includes('filing delays')) {
+                    aiChartTitle.textContent = 'Avg. Filing Delay Days by Category';
+                    aiSummaryText.textContent = "The analysis shows that the 'Logistics' category has the highest average GST filing delay at 12 days, indicating potential operational or cash flow issues. 'IT Services' vendors are the most punctual.";
+                    aiGeneratedChart = new Chart(ctx, { type: 'bar', data: { labels: ['Logistics', 'Raw Materials', 'Marketing', 'IT Services'], datasets: [{ label: 'Avg. Delay (Days)', data: [12, 8, 5, 2], backgroundColor: ['#ef4444', '#f59e0b', '#38bdf8', '#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+                } else if (prompt.includes('bank verification')) {
+                    aiChartTitle.textContent = 'Vendors with Failed Bank Verification';
+                    aiSummaryText.textContent = "Only one vendor, 'Global Tech Solutions Inc.' from the 'IT Services' category, had a failed bank verification. This is a critical risk that requires immediate attention to prevent payment fraud.";
+                     aiGeneratedChart = new Chart(ctx, { type: 'pie', data: { labels: ['IT Services', 'Other Categories'], datasets: [{ data: [1, 49], backgroundColor: ['#ef4444', '#e2e8f0'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+                } else {
+                    aiChartTitle.textContent = 'No Insight Found';
+                    aiSummaryText.textContent = "Sorry, I couldn't generate an insight for that prompt. Please try asking another question about vendor categories, risk statuses, or compliance details.";
+                }
+            }, 2000);
+        };
+
+        generateInsightBtn.addEventListener('click', () => handleAIInsightGeneration(aiPromptInput.value));
+        suggestionChips.forEach(chip => { chip.addEventListener('click', () => { const prompt = chip.dataset.prompt; aiPromptInput.value = prompt; handleAIInsightGeneration(prompt); }); });
+
+        window.appState = { 
+            viewVendorDrilldown: (id) => { navigate('page-vendor-drilldown'); },
+            viewInMaster: (id) => { navigate('page-vendor-master'); }
+        };
+        
+        // --- INITIALIZATION ---
+        renderVendorTable();
+        renderApiChecks();
+        renderReportLogsTable();
+        navigate('page-vendor-master');
+    });
+    </script>
+</body>
+</html>
